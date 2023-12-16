@@ -13,6 +13,10 @@ const (
 	HotelBR Hotel = ".com.br"
 	HotelNL Hotel = ".nl"
 	HotelFR Hotel = ".fr"
+	HotelES Hotel = ".es"
+	HotelFI Hotel = ".fi"
+	HotelIT Hotel = ".it"
+	HotelTR Hotel = ".com.tr"
 )
 
 type BaseClient struct {
