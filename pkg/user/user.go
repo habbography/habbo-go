@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"sync"
+	"time"
 
 	habbo "github.com/habbography/habbo-go/pkg"
 )
@@ -19,19 +20,19 @@ type User struct {
 	client                      *habbo.BaseClient
 	mutex                       sync.Mutex
 	isLoaded                    bool
-	UniqueId                    string  `json:"uniqueId"`
-	Name                        string  `json:"name"`
-	Figure                      string  `json:"figureString"`
-	Motto                       string  `json:"motto"`
-	Online                      bool    `json:"online"`
-	LastAccessTime              string  `json:"lastAccessTime"`
-	MemberSince                 string  `json:"memberSince"`
-	ProfileVisible              bool    `json:"profileVisible"`
-	CurrentLevel                int     `json:"currentLevel"`
-	CurrentLevelCompletePercent int     `json:"currentLevelCompletePercent"`
-	TotalExperience             int     `json:"totalExperience"`
-	StarGemCount                int     `json:"starGemCount"`
-	SelectedBadges              []Badge `json:"selectedBadges"`
+	UniqueId                    string    `json:"uniqueId"`
+	Name                        string    `json:"name"`
+	Figure                      string    `json:"figureString"`
+	Motto                       string    `json:"motto"`
+	Online                      bool      `json:"online"`
+	LastAccessTime              time.Time `json:"lastAccessTime"`
+	MemberSince                 time.Time `json:"memberSince"`
+	ProfileVisible              bool      `json:"profileVisible"`
+	CurrentLevel                int       `json:"currentLevel"`
+	CurrentLevelCompletePercent int       `json:"currentLevelCompletePercent"`
+	TotalExperience             int       `json:"totalExperience"`
+	StarGemCount                int       `json:"starGemCount"`
+	SelectedBadges              []Badge   `json:"selectedBadges"`
 }
 
 func NewUser(name string, client *habbo.BaseClient) *User {
@@ -48,15 +49,17 @@ func (u *User) Load() error {
 	}
 	u.mutex.Lock()
 	defer u.mutex.Unlock()
-	res, err := u.client.HttpClient.Get(fmt.Sprintf("%s/users?name=%s", u.client.BaseUrl, u.Name))
-	if err != nil {
-		return err
+	if u.UniqueId == "" {
+		res, err := u.client.HttpClient.Get(fmt.Sprintf("%s/users?name=%s", u.client.BaseUrl, u.Name))
+		if err != nil {
+			return err
+		}
+		defer res.Body.Close()
+		if err := json.NewDecoder(res.Body).Decode(u); err != nil {
+			return err
+		}
 	}
-	defer res.Body.Close()
-	if err := json.NewDecoder(res.Body).Decode(u); err != nil {
-		return err
-	}
-	res, err = u.client.HttpClient.Get(fmt.Sprintf("%s/users/%s/", u.client.BaseUrl, u.UniqueId))
+	res, err := u.client.HttpClient.Get(fmt.Sprintf("%s/users/%s/", u.client.BaseUrl, u.UniqueId))
 	if err != nil {
 		return err
 	}
@@ -105,16 +108,16 @@ func (u *User) GetOnline() (bool, error) {
 	return u.Online, nil
 }
 
-func (u *User) GetLastAccessTime() (string, error) {
+func (u *User) GetLastAccessTime() (time.Time, error) {
 	if err := u.Load(); err != nil {
-		return "", err
+		return time.Now(), err
 	}
 	return u.LastAccessTime, nil
 }
 
-func (u *User) GetMemberSince() (string, error) {
+func (u *User) GetMemberSince() (time.Time, error) {
 	if err := u.Load(); err != nil {
-		return "", err
+		return time.Now(), err
 	}
 	return u.MemberSince, nil
 }
