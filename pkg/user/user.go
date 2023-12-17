@@ -1,6 +1,7 @@
 package user
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"sync"
@@ -43,14 +44,14 @@ func NewUser(name string, client *habbo.BaseClient) *User {
 	}
 }
 
-func (u *User) Load() error {
+func (u *User) Load(ctx context.Context) error {
 	if u.isLoaded {
 		return nil
 	}
 	u.mutex.Lock()
 	defer u.mutex.Unlock()
 	if u.UniqueId == "" {
-		res, err := u.client.HttpClient.Get(fmt.Sprintf("%s/users?name=%s", u.client.BaseUrl, u.Name))
+		res, err := u.client.Get(ctx, fmt.Sprintf("%s/users?name=%s", u.client.BaseUrl, u.Name))
 		if err != nil {
 			return err
 		}
@@ -59,7 +60,7 @@ func (u *User) Load() error {
 			return err
 		}
 	}
-	res, err := u.client.HttpClient.Get(fmt.Sprintf("%s/users/%s/", u.client.BaseUrl, u.UniqueId))
+	res, err := u.client.Get(ctx, fmt.Sprintf("%s/users/%s/", u.client.BaseUrl, u.UniqueId))
 	if err != nil {
 		return err
 	}
@@ -71,94 +72,92 @@ func (u *User) Load() error {
 	return nil
 }
 
-func (u *User) Refresh() error {
-	u.isLoaded = false
-	return u.Load()
-}
-
-func (u *User) GetUniqueId() (string, error) {
-	if err := u.Load(); err != nil {
+func (u *User) GetUniqueId(ctx context.Context) (string, error) {
+	if err := u.Load(ctx); err != nil {
 		return "", err
 	}
 	return u.UniqueId, nil
 }
 
-func (u *User) GetName() string {
-	return u.Name
+func (u *User) GetName(ctx context.Context) (string, error) {
+	if err := u.Load(ctx); err != nil {
+		return "", err
+	}
+	return u.Name, nil
 }
 
-func (u *User) GetFigure() (string, error) {
-	if err := u.Load(); err != nil {
+func (u *User) GetFigure(ctx context.Context) (string, error) {
+	if err := u.Load(ctx); err != nil {
 		return "", err
 	}
 	return u.Figure, nil
 }
 
-func (u *User) GetMotto() (string, error) {
-	if err := u.Load(); err != nil {
+func (u *User) GetMotto(ctx context.Context) (string, error) {
+	if err := u.Load(ctx); err != nil {
 		return "", err
 	}
 	return u.Motto, nil
 }
 
-func (u *User) GetOnline() (bool, error) {
-	if err := u.Load(); err != nil {
+func (u *User) GetOnline(ctx context.Context) (bool, error) {
+	if err := u.Load(ctx); err != nil {
 		return false, err
 	}
 	return u.Online, nil
 }
 
-func (u *User) GetLastAccessTime() (time.Time, error) {
-	if err := u.Load(); err != nil {
+func (u *User) GetLastAccessTime(ctx context.Context) (time.Time, error) {
+	if err := u.Load(ctx); err != nil {
 		return time.Now(), err
 	}
 	return u.LastAccessTime, nil
 }
 
-func (u *User) GetMemberSince() (time.Time, error) {
-	if err := u.Load(); err != nil {
+func (u *User) GetMemberSince(ctx context.Context) (time.Time, error) {
+	if err := u.Load(ctx); err != nil {
 		return time.Now(), err
 	}
 	return u.MemberSince, nil
 }
 
-func (u *User) GetProfileVisible() (bool, error) {
-	if err := u.Load(); err != nil {
+func (u *User) GetProfileVisible(ctx context.Context) (bool, error) {
+	if err := u.Load(ctx); err != nil {
 		return false, err
 	}
 	return u.ProfileVisible, nil
 }
 
-func (u *User) GetCurrentLevel() (int, error) {
-	if err := u.Load(); err != nil {
+func (u *User) GetCurrentLevel(ctx context.Context) (int, error) {
+	if err := u.Load(ctx); err != nil {
 		return 0, err
 	}
 	return u.CurrentLevel, nil
 }
 
-func (u *User) GetCurrentLevelCompletePercent() (int, error) {
-	if err := u.Load(); err != nil {
+func (u *User) GetCurrentLevelCompletePercent(ctx context.Context) (int, error) {
+	if err := u.Load(ctx); err != nil {
 		return 0, err
 	}
 	return u.CurrentLevelCompletePercent, nil
 }
 
-func (u *User) GetTotalExperience() (int, error) {
-	if err := u.Load(); err != nil {
+func (u *User) GetTotalExperience(ctx context.Context) (int, error) {
+	if err := u.Load(ctx); err != nil {
 		return 0, err
 	}
 	return u.TotalExperience, nil
 }
 
-func (u *User) GetStarGemCount() (int, error) {
-	if err := u.Load(); err != nil {
+func (u *User) GetStarGemCount(ctx context.Context) (int, error) {
+	if err := u.Load(ctx); err != nil {
 		return 0, err
 	}
 	return u.StarGemCount, nil
 }
 
-func (u *User) GetSelectedBadges() ([]Badge, error) {
-	if err := u.Load(); err != nil {
+func (u *User) GetSelectedBadges(ctx context.Context) ([]Badge, error) {
+	if err := u.Load(ctx); err != nil {
 		return nil, err
 	}
 	return u.SelectedBadges, nil

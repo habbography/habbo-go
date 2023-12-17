@@ -1,6 +1,7 @@
 package user
 
 import (
+	"context"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -28,8 +29,9 @@ func TestUser_Load(t *testing.T) {
 	}
 
 	user := NewUser("test", client)
+	ctx := context.Background()
 
-	err := user.Load()
+	err := user.Load(ctx)
 	assert.NoError(t, err)
 	assert.Equal(t, "1234", user.UniqueId)
 	assert.Equal(t, "test", user.Name)

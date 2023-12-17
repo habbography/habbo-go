@@ -1,6 +1,7 @@
 package group
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"sync"
@@ -38,13 +39,13 @@ func NewGroup(groupId string, client *habbo.BaseClient) *Group {
 	}
 }
 
-func (g *Group) Load() error {
+func (g *Group) Load(ctx context.Context) error {
 	if g.isLoaded {
 		return nil
 	}
 	g.mutex.Lock()
 	defer g.mutex.Unlock()
-	res, err := g.client.HttpClient.Get(fmt.Sprintf("%s/groups/%s/", g.client.BaseUrl, g.Id))
+	res, err := g.client.Get(ctx, fmt.Sprintf("%s/groups/%s/", g.client.BaseUrl, g.Id))
 	if err != nil {
 		return err
 	}
@@ -56,18 +57,18 @@ func (g *Group) Load() error {
 	return nil
 }
 
-func (g *Group) GetId() (string, error) {
+func (g *Group) GetId(ctx context.Context) (string, error) {
 	if !g.isLoaded {
-		if err := g.Load(); err != nil {
+		if err := g.Load(ctx); err != nil {
 			return "", err
 		}
 	}
 	return g.Id, nil
 }
 
-func (g *Group) GetName() (string, error) {
+func (g *Group) GetName(ctx context.Context) (string, error) {
 	if !g.isLoaded {
-		if err := g.Load(); err != nil {
+		if err := g.Load(ctx); err != nil {
 			return "", err
 		}
 
@@ -75,54 +76,54 @@ func (g *Group) GetName() (string, error) {
 	return g.Name, nil
 }
 
-func (g *Group) GetDescription() (string, error) {
+func (g *Group) GetDescription(ctx context.Context) (string, error) {
 	if !g.isLoaded {
-		if err := g.Load(); err != nil {
+		if err := g.Load(ctx); err != nil {
 			return "", err
 		}
 	}
 	return g.Description, nil
 }
 
-func (g *Group) GetType() (GroupType, error) {
+func (g *Group) GetType(ctx context.Context) (GroupType, error) {
 	if !g.isLoaded {
-		if err := g.Load(); err != nil {
+		if err := g.Load(ctx); err != nil {
 			return "", err
 		}
 	}
 	return g.Type, nil
 }
 
-func (g *Group) GetRoomId() (string, error) {
+func (g *Group) GetRoomId(ctx context.Context) (string, error) {
 	if !g.isLoaded {
-		if err := g.Load(); err != nil {
+		if err := g.Load(ctx); err != nil {
 			return "", err
 		}
 	}
 	return g.RoomId, nil
 }
 
-func (g *Group) GetBadgeCode() (string, error) {
+func (g *Group) GetBadgeCode(ctx context.Context) (string, error) {
 	if !g.isLoaded {
-		if err := g.Load(); err != nil {
+		if err := g.Load(ctx); err != nil {
 			return "", err
 		}
 	}
 	return g.BadgeCode, nil
 }
 
-func (g *Group) GetPrimaryColour() (string, error) {
+func (g *Group) GetPrimaryColour(ctx context.Context) (string, error) {
 	if !g.isLoaded {
-		if err := g.Load(); err != nil {
+		if err := g.Load(ctx); err != nil {
 			return "", err
 		}
 	}
 	return g.PrimaryColour, nil
 }
 
-func (g *Group) GetSecondaryColour() (string, error) {
+func (g *Group) GetSecondaryColour(ctx context.Context) (string, error) {
 	if !g.isLoaded {
-		if err := g.Load(); err != nil {
+		if err := g.Load(ctx); err != nil {
 			return "", err
 		}
 	}

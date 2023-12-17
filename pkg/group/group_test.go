@@ -1,6 +1,7 @@
 package group
 
 import (
+	"context"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -34,7 +35,8 @@ func TestGroup_Load(t *testing.T) {
 		HttpClient: server.Client(),
 	}
 	group := NewGroup("1234", client)
-	err := group.Load()
+	ctx := context.Background()
+	err := group.Load(ctx)
 	assert.NoError(t, err)
 	assert.Equal(t, "TestGroup", group.Name)
 	assert.Equal(t, GroupTypeClosed, group.Type)

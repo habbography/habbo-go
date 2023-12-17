@@ -1,6 +1,7 @@
 package habbo
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 )
@@ -31,4 +32,13 @@ func NewClient(hotel Hotel) *BaseClient {
 		BaseUrl:    fmt.Sprintf("https://habbo%s/api/public", hotel),
 		HttpClient: &http.Client{},
 	}
+}
+
+func (c *BaseClient) Get(ctx context.Context, url string) (resp *http.Response, err error) {
+	req, err := http.NewRequest("GET", url, nil)
+	req.WithContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return c.HttpClient.Do(req)
 }
